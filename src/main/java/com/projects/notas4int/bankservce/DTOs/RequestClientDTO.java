@@ -13,11 +13,11 @@ public class RequestClientDTO {
     @NotEmpty
     private String password;
 
-    @NotEmpty
+//    @NotEmpty
     private double balance;
 
     @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$")
-    private String phoneNumber;
+    private String phone;
 
     @Email
     private String email;

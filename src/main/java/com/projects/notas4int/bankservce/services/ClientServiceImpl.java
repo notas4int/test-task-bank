@@ -23,6 +23,7 @@ public class ClientServiceImpl implements ClientService {
         Client client = clientMapper.convertClientDTOtoClientModel(requestClientDTO);
         BankAccount bankAccount = bankAccountMapper.convertClientDTOtoBankAccountModel(requestClientDTO);
         client.setBankAccount(bankAccount);
+        bankAccount.setClient(client);
 
         clientRepository.save(client);
     }

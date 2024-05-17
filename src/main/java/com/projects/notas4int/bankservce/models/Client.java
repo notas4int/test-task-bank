@@ -20,10 +20,8 @@ public class Client {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotEmpty
     private String name;
 
-    @NotEmpty
     private String surname;
 
     @Column(name = "middle_name")
@@ -33,14 +31,15 @@ public class Client {
     @Temporal(TemporalType.DATE)
     private LocalDate dateOfBirthday;
 
-    @Column(name = "phone_number")
     @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$")
-    private String phoneNumber;
+    private String phone;
 
+    // TODO: 17.05.2024 добавить аннотацию для проверки почты
     @Email
+    @NotEmpty
     private String email;
 
     // TODO: 17.05.2024 добавить каскадирование
-    @OneToOne(mappedBy = "client")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "client")
     private BankAccount bankAccount;
 }
