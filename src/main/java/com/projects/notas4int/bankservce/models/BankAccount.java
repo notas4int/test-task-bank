@@ -2,13 +2,15 @@ package com.projects.notas4int.bankservce.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "bank-account")
+@Table(name = "bank-account", uniqueConstraints = { @UniqueConstraint(columnNames = { "login" }) })
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,18 +19,18 @@ public class BankAccount {
     private long id;
 
     @NotEmpty
+    @Size(min = 4, max = 10)
     private String login;
 
-    // TODO: 17.05.2024 добавить проверку на длину и наличие символов
     @NotEmpty
+    @Size(min = 8)
     private String password;
 
-//    @NotEmpty
+    @NotNull
     @Positive
     private double balance;
 
-    // TODO: 17.05.2024 добавить каскадирование
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @MapsId
     @JoinColumn(name = "id")
     private Client client;

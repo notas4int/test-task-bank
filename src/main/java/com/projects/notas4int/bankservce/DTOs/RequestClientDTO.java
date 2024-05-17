@@ -1,8 +1,6 @@
 package com.projects.notas4int.bankservce.DTOs;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 
 @Getter
@@ -13,12 +11,14 @@ public class RequestClientDTO {
     @NotEmpty
     private String password;
 
-//    @NotEmpty
+    @NotNull
+    @Positive
     private double balance;
 
     @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$")
     private String phone;
 
     @Email
+    @NotEmpty
     private String email;
 }

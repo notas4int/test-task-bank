@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "phone", "email" }) })
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,12 +34,11 @@ public class Client {
     @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$")
     private String phone;
 
-    // TODO: 17.05.2024 добавить аннотацию для проверки почты
     @Email
     @NotEmpty
+    @Pattern(regexp = "^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$")
     private String email;
 
-    // TODO: 17.05.2024 добавить каскадирование
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "client")
     private BankAccount bankAccount;
 }
