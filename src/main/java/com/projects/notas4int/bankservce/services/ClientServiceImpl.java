@@ -6,6 +6,7 @@ import com.projects.notas4int.bankservce.mappers.ClientMapper;
 import com.projects.notas4int.bankservce.models.BankAccount;
 import com.projects.notas4int.bankservce.models.Client;
 import com.projects.notas4int.bankservce.repositories.ClientRepository;
+import com.projects.notas4int.bankservce.security.exceptions.ClientExistsException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,10 @@ public class ClientServiceImpl implements ClientService {
 
     @Transactional
     public void saveClient(RequestClientDTO requestClientDTO) {
-        // TODO: 17.05.2024 проверка на существование аккаунта
+        if (clientRepository.existsByPhoneOrEmailOrLogin(requestClientDTO.getEmail(), requestClientDTO.getPhone(), requestClientDTO.getLogin())) {
+            throw new ClientExistsException("Client already exists");
+        }
+
         Client client = clientMapper.convertClientDTOtoClientModel(requestClientDTO);
         BankAccount bankAccount = bankAccountMapper.convertClientDTOtoBankAccountModel(requestClientDTO);
         client.setBankAccount(bankAccount);
