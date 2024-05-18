@@ -1,9 +1,9 @@
 package com.projects.notas4int.bankservce.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,11 +27,21 @@ public class BankAccount {
     private String password;
 
     @NotNull
-    @Positive
+    @Min(0)
     private double balance;
 
     @OneToOne(cascade = CascadeType.ALL)
     @MapsId
     @JoinColumn(name = "id")
     private Client client;
+
+    @Override
+    public String toString() {
+        return "PostalItem{" +
+                "id=" + id +
+                ", login=" + login +
+                ", password=" + password +
+                ", balance='" + balance +
+                '}';
+    }
 }

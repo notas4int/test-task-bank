@@ -2,7 +2,6 @@ package com.projects.notas4int.bankservce.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,10 +34,22 @@ public class Client {
     private String phone;
 
     @Email
-    @NotEmpty
     @Pattern(regexp = "^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$")
     private String email;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "client")
     private BankAccount bankAccount;
+
+    @Override
+    public String toString() {
+        return "PostalItem{" +
+                "id=" + id +
+                ", name=" + name +
+                ", surname=" + surname +
+                ", middleName='" + middleName + '\'' +
+                ", dateOfBirthday='" + dateOfBirthday + '\'' +
+                ", phone=" + phone + '\'' +
+                ", email=" + email +
+                '}';
+    }
 }
