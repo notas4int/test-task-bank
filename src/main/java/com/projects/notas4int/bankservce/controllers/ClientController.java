@@ -6,6 +6,8 @@ import com.projects.notas4int.bankservce.services.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,38 +18,43 @@ public class ClientController {
 
     @PostMapping("/add-info")
     public ResponseEntity<HttpStatus> addClientInfo(@RequestParam(required = false) String phone,
-                                                    @RequestParam(required = false) String email) {
+                                                    @RequestParam(required = false) String email,
+                                                    @AuthenticationPrincipal UserDetails userDetails) {
         checkRequestParam(phone, email);
 
-        clientService.saveClientInfo(phone, email);
+        clientService.saveClientInfo(phone, email, userDetails);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/update-info")
     public ResponseEntity<HttpStatus> updateClientInfo(@RequestParam(required = false) String phone,
-                                                       @RequestParam(required = false) String email) {
+                                                       @RequestParam(required = false) String email,
+                                                       @AuthenticationPrincipal UserDetails userDetails) {
         checkRequestParam(phone, email);
 
-        clientService.updateClientInfo(phone, email);
+        clientService.updateClientInfo(phone, email, userDetails);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @DeleteMapping("/delete-info")
     public ResponseEntity<HttpStatus> deleteClientInfo(@RequestParam(required = false, defaultValue = "false") boolean phone,
-                                                       @RequestParam(required = false, defaultValue = "false") boolean email) {
+                                                       @RequestParam(required = false, defaultValue = "false") boolean email,
+                                                       @AuthenticationPrincipal UserDetails userDetails) {
         if (!phone && !email)
             throw new RequestParamNotFoundException("Phone and email not entered");
         if (phone && email)
             throw new LastClientConnectedWayRemoveException("It is not possible to delete the last communication method. " +
                     "You must specify either a phone number or an e-mail address");
 
-        clientService.removeClientInfo(phone, email);
+        clientService.removeClientInfo(phone, email, userDetails);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/transfer-money")
-    public ResponseEntity<HttpStatus> transferMoney(@RequestParam String login, @RequestParam double amountOfFunds) {
-        clientService.transferMoneyByLogin(login, amountOfFunds);
+    public ResponseEntity<HttpStatus> transferMoney(@RequestParam String login,
+                                                    @RequestParam double amountOfFunds,
+                                                    @AuthenticationPrincipal UserDetails userDetails) {
+        clientService.transferMoneyByLogin(login, amountOfFunds, userDetails);
 
         return ResponseEntity.ok(HttpStatus.OK);
     }

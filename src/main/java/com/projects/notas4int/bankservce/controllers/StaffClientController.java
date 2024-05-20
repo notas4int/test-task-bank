@@ -1,10 +1,10 @@
 package com.projects.notas4int.bankservce.controllers;
 
-import com.projects.notas4int.bankservce.DTOs.RequestClientDTO;
-import com.projects.notas4int.bankservce.services.ClientService;
+import com.projects.notas4int.bankservce.DTOs.RequestRegisterDTO;
+import com.projects.notas4int.bankservce.DTOs.ResponseAuthenticationDTO;
+import com.projects.notas4int.bankservce.services.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,11 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/staff")
 @RequiredArgsConstructor
 public class StaffClientController {
-    private final ClientService clientService;
+    private final AuthenticationService authService;
 
     @PostMapping("/create-client")
-    public ResponseEntity<HttpStatus> createClient(@RequestBody @Valid RequestClientDTO requestClientDTO) {
-        clientService.saveClient(requestClientDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+    public ResponseEntity<ResponseAuthenticationDTO> createClient(@RequestBody @Valid RequestRegisterDTO request) {
+        return ResponseEntity.ok(authService.register(request));
     }
 }

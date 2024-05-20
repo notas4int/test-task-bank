@@ -1,10 +1,16 @@
 package com.projects.notas4int.bankservce.DTOs;
 
 import jakarta.validation.constraints.*;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-public class RequestClientDTO {
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class RequestRegisterDTO {
     @NotEmpty
     private String login;
 

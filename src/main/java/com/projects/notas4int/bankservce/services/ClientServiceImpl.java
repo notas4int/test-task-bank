@@ -1,16 +1,18 @@
 package com.projects.notas4int.bankservce.services;
 
-import com.projects.notas4int.bankservce.DTOs.RequestClientDTO;
-import com.projects.notas4int.bankservce.mappers.BankAccountMapper;
+import com.projects.notas4int.bankservce.DTOs.RequestRegisterDTO;
 import com.projects.notas4int.bankservce.mappers.ClientMapper;
 import com.projects.notas4int.bankservce.models.BankAccount;
 import com.projects.notas4int.bankservce.models.Client;
 import com.projects.notas4int.bankservce.repositories.BankAccountRepository;
 import com.projects.notas4int.bankservce.repositories.ClientRepository;
 import com.projects.notas4int.bankservce.security.exceptions.*;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.regex.Pattern;
 
@@ -19,30 +21,34 @@ import java.util.regex.Pattern;
 public class ClientServiceImpl implements ClientService {
     private final ClientRepository clientRepository;
     private final BankAccountRepository bankAccountRepository;
-    private final BankAccountMapper bankAccountMapper;
     private final ClientMapper clientMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void saveClient(RequestClientDTO requestClientDTO) {
-        if (clientRepository.existsByPhoneOrEmailOrLogin(requestClientDTO.getEmail(), requestClientDTO.getPhone(), requestClientDTO.getLogin())) {
+    public BankAccount saveClient(RequestRegisterDTO request) {
+        if (clientRepository.existsByPhoneOrEmailOrLogin(request.getEmail(), request.getPhone(), request.getLogin())) {
             throw new ClientExistsException("Client already exists");
         }
 
-        Client client = clientMapper.convertClientDTOtoClientModel(requestClientDTO);
-        BankAccount bankAccount = bankAccountMapper.convertClientDTOtoBankAccountModel(requestClientDTO);
+        Client client = clientMapper.convertClientDTOtoClientModel(request);
+        BankAccount bankAccount = BankAccount.builder()
+                .login(request.getLogin())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .balance(request.getBalance())
+                .build();
+
         client.setBankAccount(bankAccount);
         bankAccount.setClient(client);
-
         clientRepository.save(client);
+
+        return bankAccount;
     }
 
     @Override
     @Transactional
-    public void saveClientInfo(String phone, String email) {
-        // TODO: 18.05.2024 изменить получение аккаунта через аутентификацию через логин
-        Client client = bankAccountRepository.findById(1L)
-                .orElseThrow(() -> new BankAccountNotFoundException("Bank account with login '" + "login" + "' not found"))
-                .getClient();
+    @PreAuthorize("#userDetails.getUsername() == authentication.principal.username")
+    public void saveClientInfo(String phone, String email, UserDetails userDetails) {
+        Client client = findClientByLogin(userDetails.getUsername());
 
         if (phone != null) {
             if (client.getPhone() == null) {
@@ -71,13 +77,10 @@ public class ClientServiceImpl implements ClientService {
         clientRepository.save(client);
     }
 
-    @Override
     @Transactional
-    public void updateClientInfo(String phone, String email) {
-        // TODO: 18.05.2024 изменить получение аккаунта через аутентификацию через логин
-        Client client = bankAccountRepository.findById(1L)
-                .orElseThrow(() -> new BankAccountNotFoundException("Bank account with login '" + "login" + "' not found"))
-                .getClient();
+    @PreAuthorize("#userDetails.getUsername() == authentication.principal.username")
+    public void updateClientInfo(String phone, String email, UserDetails userDetails) {
+        Client client = findClientByLogin(userDetails.getUsername());
 
         if (phone != null) {
             if (client.getPhone() != null) {
@@ -112,13 +115,10 @@ public class ClientServiceImpl implements ClientService {
         clientRepository.save(client);
     }
 
-    @Override
     @Transactional
-    public void removeClientInfo(boolean phone, boolean email) {
-        // TODO: 18.05.2024 изменить получение аккаунта через аутентификацию через логин
-        Client client = bankAccountRepository.findById(1L)
-                .orElseThrow(() -> new BankAccountNotFoundException("Bank account with login '" + "login" + "' not found"))
-                .getClient();
+    @PreAuthorize("#userDetails.getUsername() == authentication.principal.username")
+    public void removeClientInfo(boolean phone, boolean email, UserDetails userDetails) {
+        Client client = findClientByLogin(userDetails.getUsername());
 
         if (phone) {
             if (client.getPhone() != null) {
@@ -143,10 +143,11 @@ public class ClientServiceImpl implements ClientService {
         clientRepository.save(client);
     }
 
-    @Override
     @Transactional
-    public void transferMoneyByLogin(String login, double amountOfFunds) {
-        BankAccount senderBankAccount = bankAccountRepository.findBankAccountByLogin("asksddjk").orElseThrow(() -> new BankAccountNotFoundException("Bank account with login '" + "asksddjk" + "' not found"));
+    @PreAuthorize("#userDetails.getUsername() == authentication.principal.username")
+    public void transferMoneyByLogin(String login, double amountOfFunds, UserDetails userDetails) {
+        BankAccount senderBankAccount = bankAccountRepository.findBankAccountByLogin(userDetails.getUsername()).orElseThrow(() -> new BankAccountNotFoundException("Bank account with login '" + "asksddjk" + "' not found"));
+
         double senderBalance = senderBankAccount.getBalance();
         if (senderBalance - amountOfFunds < 0)
             throw new insufficientFundsInBalanceException("There are not enough funds on the balance sheet to make a transfer");
@@ -162,5 +163,11 @@ public class ClientServiceImpl implements ClientService {
 
         bankAccountRepository.save(senderBankAccount);
         bankAccountRepository.save(recipientBankAccount);
+    }
+
+    private Client findClientByLogin(String login) {
+        return bankAccountRepository.findBankAccountByLogin(login)
+                .orElseThrow(() -> new BankAccountNotFoundException("Bank account with login '" + login + "' not found"))
+                .getClient();
     }
 }

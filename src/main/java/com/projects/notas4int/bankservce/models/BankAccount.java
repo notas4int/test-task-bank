@@ -6,14 +6,18 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name = "bank-account", uniqueConstraints = { @UniqueConstraint(columnNames = { "login" }) })
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class BankAccount {
     @Id
     private long id;
@@ -34,6 +38,9 @@ public class BankAccount {
     @MapsId
     @JoinColumn(name = "id")
     private Client client;
+
+    @OneToMany(mappedBy = "bankAccount")
+    private List<Token> tokens;
 
     @Override
     public String toString() {
