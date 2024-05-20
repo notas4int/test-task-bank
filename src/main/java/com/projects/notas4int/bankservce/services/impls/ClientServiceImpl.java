@@ -1,4 +1,4 @@
-package com.projects.notas4int.bankservce.services;
+package com.projects.notas4int.bankservce.services.impls;
 
 import com.projects.notas4int.bankservce.DTOs.RequestRegisterDTO;
 import com.projects.notas4int.bankservce.mappers.ClientMapper;
@@ -7,7 +7,10 @@ import com.projects.notas4int.bankservce.models.Client;
 import com.projects.notas4int.bankservce.repositories.BankAccountRepository;
 import com.projects.notas4int.bankservce.repositories.ClientRepository;
 import com.projects.notas4int.bankservce.security.exceptions.*;
+import com.projects.notas4int.bankservce.services.ClientService;
+import com.projects.notas4int.bankservce.utils.AsyncUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +26,9 @@ public class ClientServiceImpl implements ClientService {
     private final BankAccountRepository bankAccountRepository;
     private final ClientMapper clientMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AsyncUtil scheduledTasksService;
 
+    @SneakyThrows
     @Transactional
     public BankAccount saveClient(RequestRegisterDTO request) {
         if (clientRepository.existsByPhoneOrEmailOrLogin(request.getEmail(), request.getPhone(), request.getLogin())) {
@@ -40,6 +45,7 @@ public class ClientServiceImpl implements ClientService {
         client.setBankAccount(bankAccount);
         bankAccount.setClient(client);
         clientRepository.save(client);
+        scheduledTasksService.incBalanceAfterDepositByLogin(request.getLogin(), request.getBalance());
 
         return bankAccount;
     }
