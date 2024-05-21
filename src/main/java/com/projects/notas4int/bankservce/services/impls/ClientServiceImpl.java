@@ -156,7 +156,7 @@ public class ClientServiceImpl implements ClientService {
 
         double senderBalance = senderBankAccount.getBalance();
         if (senderBalance - amountOfFunds < 0)
-            throw new insufficientFundsInBalanceException("There are not enough funds on the balance sheet to make a transfer");
+            throw new InsufficientFundsInBalanceException("There are not enough funds on the balance sheet to make a transfer");
 
         BankAccount recipientBankAccount = bankAccountRepository.findBankAccountByLogin(login).orElseThrow(() -> new BankAccountNotFoundException("Bank account with login '" + login + "' not found"));
         double recipientBalance = recipientBankAccount.getBalance();
