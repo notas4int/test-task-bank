@@ -14,14 +14,17 @@ public class AsyncUtil {
 
     @Async
     public void incBalanceAfterDepositByLogin(String login, double depositBalance) throws InterruptedException {
+        log.info("Thread starting");
         double limitBalance = depositBalance * 2.07;
+        log.info(depositBalance);
         depositBalance += depositBalance * 0.05;
 
         while (depositBalance <= limitBalance) {
             Thread.sleep(60000);
+            log.info(depositBalance);
             bankAccountService.incDepAndUpdateAccount(login, depositBalance);
             depositBalance += depositBalance * 0.05;
-            log.info(depositBalance);
         }
+        log.info("Thread terminate");
     }
 }

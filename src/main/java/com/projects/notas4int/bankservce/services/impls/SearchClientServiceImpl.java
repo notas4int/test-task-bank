@@ -7,6 +7,7 @@ import com.projects.notas4int.bankservce.repositories.SearchClientRepository;
 import com.projects.notas4int.bankservce.security.exceptions.BankAccountNotFoundException;
 import com.projects.notas4int.bankservce.services.SearchClientService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 @Transactional
 public class SearchClientServiceImpl implements SearchClientService {
     private final SearchClientRepository searchClientRepository;
@@ -41,6 +43,7 @@ public class SearchClientServiceImpl implements SearchClientService {
         Client client = searchClientRepository.findClientByPhone(phone)
                 .orElseThrow(() -> new BankAccountNotFoundException("Bank account with phone '"
                         + phone + "' not found"));
+        log.info(client.toString());
 
         return clientMapper.convertClientToClientResponse(client);
     }
@@ -54,6 +57,7 @@ public class SearchClientServiceImpl implements SearchClientService {
         Client client = searchClientRepository.findClientBySurnameAndNameAndMiddleName(surname, name, middleName)
                 .orElseThrow(() -> new BankAccountNotFoundException("Bank account with initials '"
                         + initials + "' not found"));
+        log.info(client.toString());
 
         return clientMapper.convertClientToClientResponse(client);
     }
@@ -63,6 +67,7 @@ public class SearchClientServiceImpl implements SearchClientService {
         Client client = searchClientRepository.findClientByEmail(email)
                 .orElseThrow(() -> new BankAccountNotFoundException("Bank account with date of birthday '"
                         + email + "' not found"));
+        log.info(client.toString());
 
         return clientMapper.convertClientToClientResponse(client);
     }

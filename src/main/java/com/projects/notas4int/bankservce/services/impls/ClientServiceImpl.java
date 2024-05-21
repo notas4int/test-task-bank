@@ -11,6 +11,7 @@ import com.projects.notas4int.bankservce.services.ClientService;
 import com.projects.notas4int.bankservce.utils.AsyncUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.regex.Pattern;
 
 @Service
+@Log4j2
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
     private final ClientRepository clientRepository;
@@ -153,6 +155,7 @@ public class ClientServiceImpl implements ClientService {
     @PreAuthorize("#userDetails.getUsername() == authentication.principal.username")
     public void transferMoneyByLogin(String login, double amountOfFunds, UserDetails userDetails) {
         BankAccount senderBankAccount = bankAccountRepository.findBankAccountByLogin(userDetails.getUsername()).orElseThrow(() -> new BankAccountNotFoundException("Bank account with login '" + "asksddjk" + "' not found"));
+        log.info(senderBankAccount.toString());
 
         double senderBalance = senderBankAccount.getBalance();
         if (senderBalance - amountOfFunds < 0)
@@ -160,9 +163,12 @@ public class ClientServiceImpl implements ClientService {
 
         BankAccount recipientBankAccount = bankAccountRepository.findBankAccountByLogin(login).orElseThrow(() -> new BankAccountNotFoundException("Bank account with login '" + login + "' not found"));
         double recipientBalance = recipientBankAccount.getBalance();
+        log.info(recipientBankAccount.toString());
 
         double senderBalanceAfterTransfer = senderBalance - amountOfFunds;
         double recipientBalanceAfterTransfer = recipientBalance + amountOfFunds;
+        log.info("Sender balance: " + senderBalanceAfterTransfer);
+        log.info("Recipient balance: " + recipientBalanceAfterTransfer);
 
         senderBankAccount.setBalance(senderBalanceAfterTransfer);
         recipientBankAccount.setBalance(recipientBalanceAfterTransfer);
