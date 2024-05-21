@@ -1,5 +1,6 @@
-package com.projects.notas4int.bankservce.security;
+package com.projects.notas4int.bankservce.configs;
 
+import com.projects.notas4int.bankservce.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +21,10 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-    private static final String[] WHITE_LIST_URL = { "/api/v1/staff/create-client", "/api/v1/auth/*" };
+    private static final String[] WHITE_LIST_URL = { "/api/v1/staff/create-client", "/api/v1/auth/*", "/swagger-resources",
+            "/swagger-resources/**", "/configuration/ui", "/configuration/security", "/swagger-ui/**", "/webjars/**",
+            "/swagger-ui.html", "/v1/api-docs", "/swagger-ui/index.html", "/v2/api-docs", "/v3/api-docs",
+            "/v3/api-docs/**"};
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
