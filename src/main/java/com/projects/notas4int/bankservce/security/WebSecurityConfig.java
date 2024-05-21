@@ -33,7 +33,7 @@ public class WebSecurityConfig {
                         req
                                 .requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
-                                .requestMatchers("/api/v1/client/*")
+                                .anyRequest()
                                 .authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
